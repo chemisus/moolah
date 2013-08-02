@@ -3,6 +3,7 @@
 namespace Moolah\AuthorizeNET;
 
 use AuthorizeNetAIM;
+use AuthorizeNetCIM;
 
 class StateTemplate
 {
@@ -17,9 +18,18 @@ class StateTemplate
         $this->transaction_key = $transaction_key;
     }
 
-    public function makeAuthorizeNet()
+    public function makeAuthorizeNetAIM()
     {
         $api = new AuthorizeNetAIM($this->login_key, $this->transaction_key);
+
+        $api->setSandbox(true);
+
+        return $api;
+    }
+
+    public function makeAuthorizeNetCIM()
+    {
+        $api = new AuthorizeNetCIM($this->login_key, $this->transaction_key);
 
         $api->setSandbox(true);
 

@@ -7,7 +7,7 @@ use Moolah\TransactionAction;
 use Moolah\TransactionActionState;
 use Moolah\TransactionCommand;
 
-class ChargePendingState extends StateTemplate implements TransactionActionState
+class ChargeCardPendingState extends StateTemplate implements TransactionActionState
 {
 
     public function execute(
@@ -16,7 +16,7 @@ class ChargePendingState extends StateTemplate implements TransactionActionState
         TransactionAction $transaction_action
     ) {
         // get the api.
-        $api = $this->makeAuthorizeNet();
+        $api = $this->makeAuthorizeNetAIM();
 
         // request a new transaction.
         $response = $api->authorizeOnly(

@@ -10,7 +10,7 @@ interface TransactionAction
      *
      * @return mixed
      */
-    public function getTransactionActionType();
+    public function getTransactionType();
 
     /**
      * Gets the state of the transaction.

@@ -7,7 +7,7 @@ use Moolah\TransactionAction;
 use Moolah\TransactionActionState;
 use Moolah\TransactionCommand;
 
-class ChargeAuthorizedState extends StateTemplate implements TransactionActionState
+class ChargeCardAuthorizedState extends StateTemplate implements TransactionActionState
 {
 
     public function execute(
@@ -16,7 +16,7 @@ class ChargeAuthorizedState extends StateTemplate implements TransactionActionSt
         TransactionAction $transaction_action
     ) {
         // get the api.
-        $api = $this->makeAuthorizeNet();
+        $api = $this->makeAuthorizeNetAIM();
 
         // try to capture the payment.
         $response = $api->captureOnly(

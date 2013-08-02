@@ -16,18 +16,18 @@ class TransactionCommandTemplate implements TransactionCommand
     private $payment_transaction;
 
     /**
-     * @var ChargeTransactionAction
+     * @var ChargeCardTransactionAction
      */
     private $transaction_action;
 
     /**
      * @param PaymentTransaction       $payment_transaction
-     * @param ChargeTransactionAction  $transaction_action
+     * @param ChargeCardTransactionAction  $transaction_action
      * @param TransactionActionState[] $states
      */
     public function __construct(
         PaymentTransaction $payment_transaction,
-        ChargeTransactionAction $transaction_action,
+        TransactionAction $transaction_action,
         $states
     ) {
         $this->payment_transaction = $payment_transaction;

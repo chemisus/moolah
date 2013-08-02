@@ -2,7 +2,7 @@
 
 namespace Moolah;
 
-class SimpleChargeTransaction extends SimpleTransactionAction implements ChargeTransactionAction
+class SimpleChargeCardTransaction extends SimpleTransactionAction implements ChargeCardTransactionAction
 {
 
     private $amount;
@@ -37,7 +37,7 @@ class SimpleChargeTransaction extends SimpleTransactionAction implements ChargeT
      *
      * @return mixed
      */
-    public function getTransactionActionType()
+    public function getTransactionType()
     {
         return 'CHARGE';
     }

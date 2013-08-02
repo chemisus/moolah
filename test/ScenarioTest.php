@@ -3,9 +3,9 @@
 namespace Test\Chemisus\Moolah;
 
 use Mockery;
-use Moolah\AuthorizeNET\ChargeCommand;
+use Moolah\AuthorizeNET\ChargeCardCommand;
 use Moolah\ProcessPaymentCommand;
-use Moolah\SimpleChargeTransaction;
+use Moolah\SimpleChargeCardTransaction;
 use Moolah\SimplePaymentTransaction;
 use PHPUnit_Framework_TestCase;
 
@@ -27,17 +27,17 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         Mockery::close();
     }
 
-    public function test()
+    public function testChargeCard()
     {
         $amount              = rand(1, 99999);
         $payment_transaction = new SimplePaymentTransaction();
-        $charge_transaction  = new SimpleChargeTransaction(
+        $charge_transaction  = new SimpleChargeCardTransaction(
             $amount,
             $this->card_number,
             $this->card_expiration_date
         );
 
-        $command = new ChargeCommand(
+        $command = new ChargeCardCommand(
             $this->login_key,
             $this->transaction_key,
             $payment_transaction,
@@ -50,5 +50,32 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $charge_transaction->getTransactionState());
         $this->assertNotNull($charge_transaction->getAuthorizationCode());
         $this->assertNotNull($payment_transaction->getTransactionID());
+        $this->assertEquals('CHARGE', $charge_transaction->getTransactionType());
+    }
+
+    public function testChargeCustomer()
+    {
+        $amount              = rand(1, 99999);
+        $payment_transaction = new SimplePaymentTransaction();
+        $charge_transaction  = new SimpleChargeCardTransaction(
+            $amount,
+            $this->card_number,
+            $this->card_expiration_date
+        );
+
+        $command = new ChargeCardCommand(
+            $this->login_key,
+            $this->transaction_key,
+            $payment_transaction,
+            $charge_transaction
+        );
+
+        $command->execute();
+
+        $this->assertEquals('1', $charge_transaction->getTransactionStatus());
+        $this->assertEquals(2, $charge_transaction->getTransactionState());
+        $this->assertNotNull($charge_transaction->getAuthorizationCode());
+        $this->assertNotNull($payment_transaction->getTransactionID());
+        $this->assertEquals('CHARGE', $charge_transaction->getTransactionType());
     }
 }
