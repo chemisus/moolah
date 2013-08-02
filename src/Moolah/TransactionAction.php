@@ -5,11 +5,42 @@ namespace Moolah;
 interface TransactionAction
 {
 
-    public function isPending();
+    /**
+     * Gets the type of the transaction.
+     *
+     * @return mixed
+     */
+    public function getTransactionActionType();
 
-    public function getTransactionType();
+    /**
+     * Gets the state of the transaction.
+     *
+     * @return integer
+     */
+    public function getTransactionState();
 
-    public function getTransactionActionStatus();
+    /**
+     * Sets the state of the transaction.
+     *
+     * @param integer $value
+     *
+     * @return integer
+     */
+    public function setTransactionState($value);
 
-    public function setTransactionActionStatus($value);
+    /**
+     * Gets the status of the transaction.
+     *
+     * @return mixed
+     */
+    public function getTransactionStatus();
+
+    /**
+     * Sets the status of the transaction.
+     *
+     * @param integer $value
+     *
+     * @return mixed
+     */
+    public function setTransactionStatus($value);
 }

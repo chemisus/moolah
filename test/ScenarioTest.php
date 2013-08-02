@@ -16,6 +16,10 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
     private $transaction_key = '3839sCxWg5hx9Y3k';
 
+    private $card_number = '4007000000027';
+
+    private $card_expiration_date = '04/17';
+
     public function tearDown()
     {
         parent::tearDown();
@@ -23,72 +27,28 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         Mockery::close();
     }
 
-    public function testChargeCommandMocked()
+    public function test()
     {
-        $payment_transaction = Mockery::mock('Moolah\PaymentTransaction');
-        $transaction_action  = Mockery::mock('Moolah\ChargeTransactionAction');
-
-        $authorization_code = 'authorization_code';
-        $transaction_id     = 'transaction_id';
-        $response_code      = 'response_code';
-
-        $response                     = Mockery::mock();
-        $response->authorization_code = $authorization_code;
-        $response->transaction_id     = $transaction_id;
-        $response->response_code      = $response_code;
-
-        $api = Mockery::mock();
-        $api->shouldReceive('authorizeOnly')->once()->andReturn($response);
-        $api->shouldReceive('captureOnly')->once()->andReturn($response);
-
-        $payment_transaction->shouldReceive('setTransactionID')->with(null)->once();
-        $payment_transaction->shouldReceive('setTransactionID')->with($transaction_id)->once();
-        $transaction_action->shouldReceive('getAmount')->twice();
-        $transaction_action->shouldReceive('getCardNumber')->twice();
-        $transaction_action->shouldReceive('getCardExpirationDate')->twice();
-        $transaction_action->shouldReceive('getAuthorizationCode')->once();
-        $transaction_action->shouldReceive('setAuthorizationCode')->with($authorization_code)->once();
-        $transaction_action->shouldReceive('setTransactionActionStatus')->with($response_code)->once();
-
-        $charge_command = Mockery::mock(
-            'Moolah\AuthorizeNET\ChargeCommand',
-            [
-                $payment_transaction,
-                $transaction_action,
-                $this->login_key,
-                $this->transaction_key
-            ]
-        );
-
-        $charge_command->shouldDeferMissing();
-        $charge_command->shouldReceive('makeAuthorizeNet')->twice()->andReturn($api);
-
-        $charge_command->execute();
-    }
-
-    public function testChargeTransaction()
-    {
-        $amount               = rand(1, 99999);
-        $card_number          = '4007000000027';
-        $card_expiration_date = '04/17';
-
-        $transaction_action = new SimpleChargeTransaction($amount, $card_number, $card_expiration_date);
-
+        $amount              = rand(1, 99999);
         $payment_transaction = new SimplePaymentTransaction();
-
-        $charge_command = new ChargeCommand(
-            $payment_transaction,
-            $transaction_action,
-            $this->login_key,
-            $this->transaction_key
+        $charge_transaction  = new SimpleChargeTransaction(
+            $amount,
+            $this->card_number,
+            $this->card_expiration_date
         );
 
-        $charge_command->execute();
+        $command = new ChargeCommand(
+            $this->login_key,
+            $this->transaction_key,
+            $payment_transaction,
+            $charge_transaction
+        );
 
+        $command->execute();
+
+        $this->assertEquals('1', $charge_transaction->getTransactionStatus());
+        $this->assertEquals(2, $charge_transaction->getTransactionState());
+        $this->assertNotNull($charge_transaction->getAuthorizationCode());
         $this->assertNotNull($payment_transaction->getTransactionID());
-        $this->assertNotNull($transaction_action->getAuthorizationCode());
-        $this->assertEquals('1', $transaction_action->getTransactionActionStatus());
-        $this->assertFalse($transaction_action->isPending());
-        $this->assertEquals('CHARGE', $transaction_action->getTransactionType());
     }
 }

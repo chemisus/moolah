@@ -5,28 +5,20 @@ namespace Moolah;
 abstract class SimpleTransactionAction implements TransactionAction
 {
 
-    private $transaction_type;
+    private $transaction_status;
 
-    private $response_code;
-
-    public function __construct($transaction_type = null, $response_code = null)
+    public function __construct($transaction_status = null)
     {
-        $this->transaction_type = $transaction_type;
-        $this->response_code    = $response_code;
+        $this->transaction_status = $transaction_status;
     }
 
-    public function isPending()
+    public function getTransactionStatus()
     {
-        return $this->response_code === null;
+        return $this->transaction_status;
     }
 
-    public function getTransactionActionStatus()
+    public function setTransactionStatus($value)
     {
-        return $this->response_code;
-    }
-
-    public function setTransactionActionStatus($value)
-    {
-        $this->response_code = $value;
+        $this->transaction_status = $value;
     }
 }
