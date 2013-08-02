@@ -1,0 +1,23 @@
+{
+    "name": "chemisus/moolah",
+    "description": "moolah",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Terrence Howard",
+            "email": "chemisus@gmail.com"
+        }
+    ],
+    "require": {
+        "ajbdev/authorizenet-php-api": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "mockery/mockery": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Moolah": "src/"
+        }
+    }
+}
