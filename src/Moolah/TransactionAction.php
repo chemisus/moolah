@@ -6,6 +6,13 @@ interface TransactionAction
 {
 
     /**
+     * Get the amount the transaction is for.
+     *
+     * @return float
+     */
+    public function getAmount();
+
+    /**
      * Gets the type of the transaction.
      *
      * @return mixed

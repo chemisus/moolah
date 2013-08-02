@@ -4,8 +4,10 @@ namespace Test\Chemisus\Moolah;
 
 use Mockery;
 use Moolah\AuthorizeNET\ChargeCardCommand;
+use Moolah\AuthorizeNET\ChargeCustomerCommand;
 use Moolah\ProcessPaymentCommand;
 use Moolah\SimpleChargeCardTransaction;
+use Moolah\SimpleChargeCustomerTransaction;
 use Moolah\SimplePaymentTransaction;
 use PHPUnit_Framework_TestCase;
 
@@ -55,15 +57,20 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
     public function testChargeCustomer()
     {
-        $amount              = rand(1, 99999);
+        $amount                      = rand(1, 99999);
+        $customer_profile_id         = '20147498';
+        $customer_payment_profile_id = '18429424';
+        $customer_shipping_profile_id = '18630558';
+
         $payment_transaction = new SimplePaymentTransaction();
-        $charge_transaction  = new SimpleChargeCardTransaction(
+        $charge_transaction  = new SimpleChargeCustomerTransaction(
             $amount,
-            $this->card_number,
-            $this->card_expiration_date
+            $customer_profile_id,
+            $customer_payment_profile_id,
+            $customer_shipping_profile_id
         );
 
-        $command = new ChargeCardCommand(
+        $command = new ChargeCustomerCommand(
             $this->login_key,
             $this->transaction_key,
             $payment_transaction,
@@ -72,10 +79,10 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $command->execute();
 
-        $this->assertEquals('1', $charge_transaction->getTransactionStatus());
-        $this->assertEquals(2, $charge_transaction->getTransactionState());
+        $this->assertEquals('CHARGE', $charge_transaction->getTransactionType());
         $this->assertNotNull($charge_transaction->getAuthorizationCode());
         $this->assertNotNull($payment_transaction->getTransactionID());
-        $this->assertEquals('CHARGE', $charge_transaction->getTransactionType());
+        $this->assertEquals(2, $charge_transaction->getTransactionState());
+        $this->assertEquals('1', $charge_transaction->getTransactionStatus());
     }
 }

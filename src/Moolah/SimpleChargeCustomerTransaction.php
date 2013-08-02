@@ -32,7 +32,6 @@ class SimpleChargeCustomerTransaction extends SimpleTransactionAction implements
         $this->customer_profile_id          = $customer_profile_id;
         $this->customer_payment_profile_id  = $customer_payment_profile_id;
         $this->customer_shipping_profile_id = $customer_shipping_profile_id;
-        $this->card_expiration_date         = $card_expiration_date;
         $this->authorization_code           = $authorization_code;
         $this->transaction_state            = $transaction_state;
     }

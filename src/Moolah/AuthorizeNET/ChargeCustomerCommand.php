@@ -2,11 +2,11 @@
 
 namespace Moolah\AuthorizeNET;
 
-use Moolah\ChargeCardTransactionAction;
+use Moolah\ChargeCustomerTransactionAction;
 use Moolah\PaymentTransaction;
 use Moolah\TransactionCommandTemplate;
 
-class ChargeCardCommand extends TransactionCommandTemplate
+class ChargeCustomerCommand extends TransactionCommandTemplate
 {
 
     public function __construct(

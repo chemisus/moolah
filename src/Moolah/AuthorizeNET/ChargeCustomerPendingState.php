@@ -7,7 +7,7 @@ use Moolah\TransactionAction;
 use Moolah\TransactionActionState;
 use Moolah\TransactionCommand;
 
-class ChargeCardPendingState extends StateTemplate implements TransactionActionState
+class ChargeCustomerPendingState extends StateTemplate implements TransactionActionState
 {
 
     public function execute(
@@ -18,18 +18,19 @@ class ChargeCardPendingState extends StateTemplate implements TransactionActionS
         // get the api.
         $api = $this->makeAuthorizeNetCIM();
 
-//        // request a new transaction.
-//        $response = $api->authorizeOnly(
-//            $transaction_action->getAmount(),
-//            $transaction_action->getCardNumber(),
-//            $transaction_action->getCardExpirationDate()
-//        );
-//
-//        // set the transaction id.
-//        $payment_transaction->setTransactionID($response->transaction_id);
-//
-//        // set the authorization code.
-//        $transaction_action->setAuthorizationCode($response->authorization_code);
+        // request a new transaction.
+        $transaction = new \AuthorizeNetTransaction();
+        $transaction->amount = $transaction_action->getAmount();
+        $transaction->customerProfileId = $transaction_action->getCustomerProfileID();
+        $transaction->customerPaymentProfileId = $transaction_action->getCustomerPaymentProfileID();
+        $transaction->customerShippingAddressId = $transaction_action->getCustomerShippingProfileID();
+        $response = $api->createCustomerProfileTransaction("AuthOnly", $transaction);
+
+        // set the transaction id.
+        $payment_transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
+
+        // set the authorization code.
+        $transaction_action->setAuthorizationCode($response->getTransactionResponse()->authorization_code);
 
         // move to a new state... i suggest anywhere but florida.
         $transaction_action->setTransactionState(3);

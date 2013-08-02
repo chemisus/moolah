@@ -7,7 +7,7 @@ use Moolah\TransactionAction;
 use Moolah\TransactionActionState;
 use Moolah\TransactionCommand;
 
-class ChargeCardAuthorizedState extends StateTemplate implements TransactionActionState
+class ChargeCustomerAuthorizedState extends StateTemplate implements TransactionActionState
 {
 
     public function execute(
@@ -19,15 +19,18 @@ class ChargeCardAuthorizedState extends StateTemplate implements TransactionActi
         $api = $this->makeAuthorizeNetCIM();
 
 //        // try to capture the payment.
-//        $response = $api->captureOnly(
-//            $transaction_action->getAuthorizationCode(),
-//            $transaction_action->getAmount(),
-//            $transaction_action->getCardNumber(),
-//            $transaction_action->getCardExpirationDate()
-//        );
-//
-//        // set the transaction status.
-//        $transaction_action->setTransactionStatus($response->response_code);
+        $transaction = new \AuthorizeNetTransaction();
+        $transaction->approvalCode = $transaction_action->getAuthorizationCode();
+        $transaction->amount = $transaction_action->getAmount();
+        $transaction->customerProfileId = $transaction_action->getCustomerProfileID();
+        $transaction->customerPaymentProfileId = $transaction_action->getCustomerPaymentProfileID();
+        $transaction->customerShippingAddressId = $transaction_action->getCustomerShippingProfileID();
+        $response = $api->createCustomerProfileTransaction("CaptureOnly", $transaction);
+
+        var_dump($response);
+
+        // set the transaction status.
+        $transaction_action->setTransactionStatus($response->getTransactionResponse()->response_code);
 
         // move to a new state...
         $transaction_action->setTransactionState(2);

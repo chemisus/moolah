@@ -7,7 +7,7 @@ use Moolah\TransactionAction;
 use Moolah\TransactionActionState;
 use Moolah\TransactionCommand;
 
-class ChargeCardFinalizedState implements TransactionActionState
+class ChargeCustomerFinalizedState implements TransactionActionState
 {
 
     public function execute(
