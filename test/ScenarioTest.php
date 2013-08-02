@@ -48,7 +48,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $transaction_action->shouldReceive('getCardExpirationDate')->twice();
         $transaction_action->shouldReceive('getAuthorizationCode')->once();
         $transaction_action->shouldReceive('setAuthorizationCode')->with($authorization_code)->once();
-        $transaction_action->shouldReceive('setResponseCode')->with($response_code)->once();
+        $transaction_action->shouldReceive('setTransactionActionStatus')->with($response_code)->once();
 
         $charge_command = Mockery::mock(
             'Moolah\AuthorizeNET\ChargeCommand',
@@ -87,7 +87,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $this->assertNotNull($payment_transaction->getTransactionID());
         $this->assertNotNull($transaction_action->getAuthorizationCode());
-        $this->assertEquals('1', $transaction_action->getResponseCode());
+        $this->assertEquals('1', $transaction_action->getTransactionActionStatus());
         $this->assertFalse($transaction_action->isPending());
         $this->assertEquals('CHARGE', $transaction_action->getTransactionType());
     }

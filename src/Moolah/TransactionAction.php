@@ -9,7 +9,7 @@ interface TransactionAction
 
     public function getTransactionType();
 
-    public function getResponseCode();
+    public function getTransactionActionStatus();
 
-    public function setResponseCode($value);
+    public function setTransactionActionStatus($value);
 }

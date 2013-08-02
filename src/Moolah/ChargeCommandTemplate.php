@@ -26,7 +26,7 @@ abstract class ChargeCommandTemplate
 
         $response_code = $this->capture();
 
-        $this->transaction_action->setResponseCode($response_code);
+        $this->transaction_action->setTransactionActionStatus($response_code);
     }
 
     abstract public function authorize();

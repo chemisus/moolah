@@ -20,12 +20,12 @@ abstract class SimpleTransactionAction implements TransactionAction
         return $this->response_code === null;
     }
 
-    public function getResponseCode()
+    public function getTransactionActionStatus()
     {
         return $this->response_code;
     }
 
-    public function setResponseCode($value)
+    public function setTransactionActionStatus($value)
     {
         $this->response_code = $value;
     }
