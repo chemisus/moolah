@@ -16,7 +16,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
     private $card_number = '4007000000027';
 
-    private $card_expiration_date = '04/17';
+    private $card_expiration_date = '2017-01';
 
     public function tearDown()
     {
@@ -29,13 +29,21 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
     {
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 
+        $customer_id = null;
+
         $customer = Mockery::mock('Moolah\CustomerProfile');
 
         $customer->shouldReceive('getCustomerId')->once()->andReturn(time() . rand(10, 99));
 
-        $customer->shouldReceive('setCustomerProfileId')->once();
+        $customer->shouldReceive('setCustomerProfileId')->andReturnUsing(
+            function ($value) use (&$customer_id) {
+                $customer_id = $value;
+            }
+        );
 
         $moolah->createCustomerProfile($customer);
+
+        $this->assertNotEmpty($customer_id);
     }
 
     public function testRetrieveCustomerProfile()
@@ -53,6 +61,8 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
     {
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 
+        $transaction_id = null;
+
         $payment_profile = Mockery::mock('Moolah\PaymentProfile');
         $transaction     = Mockery::mock('Moolah\Transaction');
 
@@ -60,9 +70,15 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $payment_profile->shouldReceive('getPaymentProfileId')->once()->andReturn('18602036');
 
         $transaction->shouldReceive('getAmount')->once()->andReturn(rand(1, 99999));
-        $transaction->shouldReceive('setTransactionId')->once();
+        $transaction->shouldReceive('setTransactionId')->andReturnUsing(
+            function ($value) use (&$transaction_id) {
+                $transaction_id = $value;
+            }
+        );
 
         $moolah->createCustomerTransaction($payment_profile, $transaction);
+
+        $this->assertNotEmpty($transaction_id);
     }
 
     public function testVoidCustomerTransaction()
@@ -162,7 +178,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $moolah->createCustomerProfile($customer_profile);
 
-        $moolah->createPaymentProfile($payment_profile);
+        $moolah->createPaymentProfile($payment_profile, $this->card_number, $this->card_expiration_date);
 
         $this->assertNotEmpty($customer_profile_id);
         $this->assertNotEmpty($payment_profile_id);
@@ -214,17 +230,9 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $moolah->createCustomerProfile($customer_profile);
 
-        $moolah->createPaymentProfile($payment_profile);
-
-        $moolah->createPaymentProfile($payment_profile);
-
-        $moolah->createPaymentProfile($payment_profile);
+        $moolah->createPaymentProfile($payment_profile, $this->card_number, $this->card_expiration_date);
 
         $moolah->removePaymentProfile($payment_profile);
-
-        $moolah->createPaymentProfile($payment_profile);
-
-        $moolah->createPaymentProfile($payment_profile);
     }
 
     public function testUpdateCustomerProfile()
@@ -309,9 +317,9 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $moolah->createCustomerProfile($customer_profile);
 
-        $moolah->createPaymentProfile($payment_profile);
+        $moolah->createPaymentProfile($payment_profile, $this->card_number, $this->card_expiration_date);
 
-        $moolah->updatePaymentProfile($payment_profile);
+        $moolah->updatePaymentProfile($payment_profile, $this->card_number, '2026-05');
 
         var_dump($customer_profile_id);
 

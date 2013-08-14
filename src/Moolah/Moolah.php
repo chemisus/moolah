@@ -6,6 +6,7 @@ use AuthorizeNetCIM;
 use AuthorizeNetCustomer;
 use AuthorizeNetPaymentProfile;
 use AuthorizeNetTransaction;
+use Moolah\Exception\MoolahException;
 
 class Moolah
 {
@@ -29,7 +30,7 @@ class Moolah
 
         $response = $this->request->createCustomerProfile($c);
 
-        if ($response->getResultCode() === 'Error') {
+        if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getErrorMessage());
         }
 
@@ -39,6 +40,10 @@ class Moolah
     public function retrieveCustomerProfile(CustomerProfile $customer)
     {
         $response = $this->request->getCustomerProfile($customer->getCustomerProfileId());
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
     }
 
     public function createCustomerTransaction(PaymentProfile $payment_profile, Transaction $transaction)
@@ -49,6 +54,10 @@ class Moolah
         $t->customerPaymentProfileId = $payment_profile->getPaymentProfileId();
 
         $response = $this->request->createCustomerProfileTransaction("AuthCapture", $t);
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
 
         $transaction_response = $response->getTransactionResponse();
 
@@ -62,6 +71,10 @@ class Moolah
         $t->transId = $transaction->getTransactionId();
 
         $response = $this->request->createCustomerProfileTransaction("Void", $t);
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
     }
 
     public function refundCustomerTransaction(Transaction $transaction)
@@ -72,17 +85,24 @@ class Moolah
     public function deleteCustomerProfile(CustomerProfile $customer_profile)
     {
         $response = $this->request->deleteCustomerProfile($customer_profile->getCustomerProfileId());
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
     }
 
-    public function createPaymentProfile(PaymentProfile $payment_profile)
+    public function createPaymentProfile(PaymentProfile $payment_profile, $card_number, $card_expiration)
     {
         $pp = new AuthorizeNetPaymentProfile;
 
-        $pp->customerType                        = "individual";
-        $pp->payment->creditCard->cardNumber     = "411111111111" . rand(1000, 9999);
-        $pp->payment->creditCard->expirationDate = "2015-10";
+        $pp->payment->creditCard->cardNumber     = $card_number;
+        $pp->payment->creditCard->expirationDate = $card_expiration;
 
         $response = $this->request->createCustomerPaymentProfile($payment_profile->getCustomerProfileId(), $pp);
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
 
         $payment_profile->setPaymentProfileId($response->getPaymentProfileId());
     }
@@ -93,6 +113,10 @@ class Moolah
             $payment_profile->getCustomerProfileId(),
             $payment_profile->getPaymentProfileId()
         );
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
     }
 
     public function updateCustomerProfile(CustomerProfile $customer_profile)
@@ -102,14 +126,18 @@ class Moolah
         $c->merchantCustomerId = $customer_profile->getCustomerId();
 
         $response = $this->request->updateCustomerProfile($customer_profile->getCustomerProfileId(), $c);
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
     }
 
-    public function updatePaymentProfile(PaymentProfile $payment_profile)
+    public function updatePaymentProfile(PaymentProfile $payment_profile, $card_number, $card_expiration)
     {
         $pp = new AuthorizeNetPaymentProfile;
 
-        $pp->payment->creditCard->cardNumber     = "4111111111111111";
-        $pp->payment->creditCard->expirationDate = "20".rand(18, 99)."-11";
+        $pp->payment->creditCard->cardNumber     = $card_number;
+        $pp->payment->creditCard->expirationDate = $card_expiration;
 
         $response = $this->request->updateCustomerPaymentProfile(
             $payment_profile->getCustomerProfileId(),
@@ -117,6 +145,8 @@ class Moolah
             $pp
         );
 
-        var_dump($response);
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
     }
 }
