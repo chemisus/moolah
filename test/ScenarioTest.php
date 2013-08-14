@@ -5,9 +5,11 @@ namespace Test\Chemisus\Moolah;
 use Mockery;
 use Moolah\AuthorizeNET\ChargeCardCommand;
 use Moolah\AuthorizeNET\ChargeCustomerCommand;
+use Moolah\AuthorizeNET\CreateCustomerCommand;
 use Moolah\ProcessPaymentCommand;
 use Moolah\SimpleChargeCardTransaction;
 use Moolah\SimpleChargeCustomerTransaction;
+use Moolah\SimpleCustomer;
 use Moolah\SimplePaymentTransaction;
 use PHPUnit_Framework_TestCase;
 
@@ -84,5 +86,14 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($payment_transaction->getTransactionID());
         $this->assertEquals(2, $charge_transaction->getTransactionState());
         $this->assertEquals('1', $charge_transaction->getTransactionStatus());
+    }
+
+    public function testCreateCustomerProfile()
+    {
+        $customer = new SimpleCustomer(time().rand(10,99));
+
+        $create_customer = new CreateCustomerCommand($this->login_key, $this->transaction_key, $customer);
+
+        $create_customer->execute();
     }
 }

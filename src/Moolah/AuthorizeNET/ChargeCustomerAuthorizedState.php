@@ -19,15 +19,13 @@ class ChargeCustomerAuthorizedState extends StateTemplate implements Transaction
         $api = $this->makeAuthorizeNetCIM();
 
 //        // try to capture the payment.
-        $transaction = new \AuthorizeNetTransaction();
-        $transaction->approvalCode = $transaction_action->getAuthorizationCode();
-        $transaction->amount = $transaction_action->getAmount();
-        $transaction->customerProfileId = $transaction_action->getCustomerProfileID();
-        $transaction->customerPaymentProfileId = $transaction_action->getCustomerPaymentProfileID();
+        $transaction                            = new \AuthorizeNetTransaction();
+        $transaction->approvalCode              = $transaction_action->getAuthorizationCode();
+        $transaction->amount                    = $transaction_action->getAmount();
+        $transaction->customerProfileId         = $transaction_action->getCustomerProfileID();
+        $transaction->customerPaymentProfileId  = $transaction_action->getCustomerPaymentProfileID();
         $transaction->customerShippingAddressId = $transaction_action->getCustomerShippingProfileID();
-        $response = $api->createCustomerProfileTransaction("CaptureOnly", $transaction);
-
-        var_dump($response);
+        $response                               = $api->createCustomerProfileTransaction("CaptureOnly", $transaction);
 
         // set the transaction status.
         $transaction_action->setTransactionStatus($response->getTransactionResponse()->response_code);
