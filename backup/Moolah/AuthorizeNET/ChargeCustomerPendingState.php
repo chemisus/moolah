@@ -20,10 +20,12 @@ class ChargeCustomerPendingState extends StateTemplate implements TransactionAct
 
         // request a new transaction.
         $transaction = new \AuthorizeNetTransaction();
+
         $transaction->amount = $transaction_action->getAmount();
         $transaction->customerProfileId = $transaction_action->getCustomerProfileID();
         $transaction->customerPaymentProfileId = $transaction_action->getCustomerPaymentProfileID();
         $transaction->customerShippingAddressId = $transaction_action->getCustomerShippingProfileID();
+
         $response = $api->createCustomerProfileTransaction("AuthOnly", $transaction);
 
         // set the transaction id.

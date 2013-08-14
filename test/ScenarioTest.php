@@ -6,6 +6,9 @@ use Mockery;
 use Moolah\Moolah;
 use Moolah\ProcessPaymentCommand;
 use PHPUnit_Framework_TestCase;
+use Moolah\TestChargeTransaction;
+use Moolah\TestCustomerProfile;
+use Moolah\TestPaymentProfile;
 
 class ScenarioTest extends PHPUnit_Framework_TestCase
 {
@@ -33,7 +36,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer = Mockery::mock('Moolah\CustomerProfile');
 
-        $customer->shouldReceive('getCustomerId')->once()->andReturn(time() . rand(10, 99));
+        $customer->shouldReceive('getCustomerId')->andReturn(time() . rand(10, 99));
 
         $customer->shouldReceive('setCustomerProfileId')->andReturnUsing(
             function ($value) use (&$customer_id) {
@@ -52,7 +55,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer = Mockery::mock('Moolah\CustomerProfile');
 
-        $customer->shouldReceive('getCustomerProfileId')->once()->andReturn('20314281');
+        $customer->shouldReceive('getCustomerProfileId')->andReturn('20314281');
 
         $moolah->retrieveCustomerProfile($customer);
     }
@@ -61,18 +64,45 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
     {
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 
-        $transaction_id = null;
+        $transaction_id     = null;
+        $transaction_state  = null;
+        $transaction_status = null;
+        $authorization_code = null;
 
         $payment_profile = Mockery::mock('Moolah\PaymentProfile');
-        $transaction     = Mockery::mock('Moolah\Transaction');
+        $transaction     = Mockery::mock('Moolah\ChargeTransaction');
 
-        $payment_profile->shouldReceive('getCustomerProfileId')->once()->andReturn('20314281');
-        $payment_profile->shouldReceive('getPaymentProfileId')->once()->andReturn('18602036');
+        $payment_profile->shouldReceive('getCustomerProfileId')->andReturn('20314281');
+        $payment_profile->shouldReceive('getPaymentProfileId')->andReturn('18602036');
 
-        $transaction->shouldReceive('getAmount')->once()->andReturn(rand(1, 99999));
+        $transaction->shouldReceive('getTransactionAmount')->andReturn(rand(1, 99999));
         $transaction->shouldReceive('setTransactionId')->andReturnUsing(
             function ($value) use (&$transaction_id) {
                 $transaction_id = $value;
+            }
+        );
+
+        $transaction->shouldReceive('getAuthorizationCode')->andReturnUsing(
+            function () use (&$authorization_code) {
+                return $authorization_code;
+            }
+        );
+
+        $transaction->shouldReceive('setAuthorizationCode')->andReturnUsing(
+            function ($value) use (&$authorization_code) {
+                $authorization_code = $value;
+            }
+        );
+
+        $transaction->shouldReceive('setTransactionState')->andReturnUsing(
+            function ($value) use (&$transaction_state) {
+                $transaction_state = $value;
+            }
+        );
+
+        $transaction->shouldReceive('setTransactionStatus')->andReturnUsing(
+            function ($value) use (&$transaction_status) {
+                $transaction_status = $value;
             }
         );
 
@@ -86,14 +116,17 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 
         $payment_profile = Mockery::mock('Moolah\PaymentProfile');
-        $transaction     = Mockery::mock('Moolah\Transaction');
+        $transaction     = Mockery::mock('Moolah\ChargeTransaction');
 
-        $transaction_id = null;
+        $transaction_id     = null;
+        $transaction_state  = null;
+        $transaction_status = null;
+        $authorization_code = null;
 
         $payment_profile->shouldReceive('getCustomerProfileId')->andReturn('20314281');
         $payment_profile->shouldReceive('getPaymentProfileId')->andReturn('18602036');
 
-        $transaction->shouldReceive('getAmount')->once()->andReturn(rand(1, 99999));
+        $transaction->shouldReceive('getTransactionAmount')->andReturn(rand(1, 99999));
         $transaction->shouldReceive('setTransactionId')->andReturnUsing(
             function ($value) use (&$transaction_id) {
                 $transaction_id = $value;
@@ -103,6 +136,30 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $transaction->shouldReceive('getTransactionId')->andReturnUsing(
             function () use (&$transaction_id) {
                 return $transaction_id;
+            }
+        );
+
+        $transaction->shouldReceive('getAuthorizationCode')->andReturnUsing(
+            function () use (&$authorization_code) {
+                return $authorization_code;
+            }
+        );
+
+        $transaction->shouldReceive('setAuthorizationCode')->andReturnUsing(
+            function ($value) use (&$authorization_code) {
+                $authorization_code = $value;
+            }
+        );
+
+        $transaction->shouldReceive('setTransactionState')->andReturnUsing(
+            function ($value) use (&$transaction_state) {
+                $transaction_state = $value;
+            }
+        );
+
+        $transaction->shouldReceive('setTransactionStatus')->andReturnUsing(
+            function ($value) use (&$transaction_status) {
+                $transaction_status = $value;
             }
         );
 
@@ -119,7 +176,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer = Mockery::mock('Moolah\CustomerProfile');
 
-        $customer->shouldReceive('getCustomerId')->once()->andReturn(time() . rand(10, 99));
+        $customer->shouldReceive('getCustomerId')->andReturn(time() . rand(10, 99));
 
         $customer->shouldReceive('setCustomerProfileId')->andReturnUsing(
             function ($value) use (&$customer_id) {
@@ -148,7 +205,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer_profile = Mockery::mock('Moolah\CustomerProfile');
 
-        $customer_profile->shouldReceive('getCustomerId')->once()->andReturn(time() . rand(10, 99));
+        $customer_profile->shouldReceive('getCustomerId')->andReturn(time() . rand(10, 99));
 
         $customer_profile->shouldReceive('setCustomerProfileId')->andReturnUsing(
             function ($value) use (&$customer_profile_id) {
@@ -194,7 +251,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer_profile = Mockery::mock('Moolah\CustomerProfile');
 
-        $customer_profile->shouldReceive('getCustomerId')->once()->andReturn(time() . rand(10, 99));
+        $customer_profile->shouldReceive('getCustomerId')->andReturn(time() . rand(10, 99));
 
         $customer_profile->shouldReceive('setCustomerProfileId')->andReturnUsing(
             function ($value) use (&$customer_profile_id) {
@@ -247,7 +304,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer_profile->shouldReceive('getCustomerId')->andReturnUsing(
             function () {
-                $value = '11110000'.rand(1000,9999);
+                $value = '11110000' . rand(1000, 9999);
 
                 return $value;
             }
@@ -281,7 +338,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $customer_profile = Mockery::mock('Moolah\CustomerProfile');
 
-        $customer_profile->shouldReceive('getCustomerId')->once()->andReturn(time() . rand(10, 99));
+        $customer_profile->shouldReceive('getCustomerId')->andReturn(time() . rand(10, 99));
 
         $customer_profile->shouldReceive('setCustomerProfileId')->andReturnUsing(
             function ($value) use (&$customer_profile_id) {
@@ -321,10 +378,37 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $moolah->updatePaymentProfile($payment_profile, $this->card_number, '2026-05');
 
-        var_dump($customer_profile_id);
-
         $this->assertNotEmpty($customer_profile_id);
         $this->assertNotEmpty($payment_profile_id);
+    }
+
+    public function testScenario()
+    {
+        $customer_profile = new TestCustomerProfile(time() . rand(10, 99));
+
+        $payment_profile = new TestPaymentProfile($customer_profile);
+
+        $charge_transaction = new TestChargeTransaction(rand(1, 99999));
+
+        $moolah = new Moolah($this->login_key, $this->transaction_key);
+
+        $moolah->createCustomerProfile($customer_profile);
+
+        $this->assertNotEmpty($customer_profile->getCustomerProfileId());
+
+        $moolah->createPaymentProfile($payment_profile, $this->card_number, $this->card_expiration_date);
+
+        $this->assertNotEmpty($payment_profile->getPaymentProfileId());
+
+        $moolah->authorize($payment_profile, $charge_transaction);
+
+        $this->assertNotEmpty($charge_transaction->getTransactionId());
+        $this->assertNotEmpty($charge_transaction->getAuthorizationCode());
+        $this->assertEquals(3, $charge_transaction->getTransactionState());
+
+        $moolah->capture($payment_profile, $charge_transaction);
+
+        $this->assertEquals(2, $charge_transaction->getTransactionState());
     }
 
 //
