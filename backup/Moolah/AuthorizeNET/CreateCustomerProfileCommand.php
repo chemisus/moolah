@@ -4,10 +4,10 @@ namespace Moolah\AuthorizeNET;
 
 use AuthorizeNetCIM;
 use AuthorizeNetCustomer;
-use Moolah\Customer;
+use Moolah\CustomerProfile;
 use Moolah\Exception\MoolahException;
 
-class CreateCustomerCommand
+class CreateCustomerProfileCommand
 {
     private $customer;
 
@@ -15,7 +15,7 @@ class CreateCustomerCommand
 
     private $login_key;
 
-    public function __construct($login_key, $transaction_key, Customer $customer)
+    public function __construct($login_key, $transaction_key, CustomerProfile $customer)
     {
         $this->transaction_key = $transaction_key;
         $this->login_key       = $login_key;

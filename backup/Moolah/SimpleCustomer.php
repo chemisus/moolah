@@ -2,7 +2,7 @@
 
 namespace Moolah;
 
-class SimpleCustomer implements Customer
+class SimpleCustomer implements CustomerProfile
 {
 
     private $customer_id;
