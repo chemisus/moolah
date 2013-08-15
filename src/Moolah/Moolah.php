@@ -63,7 +63,7 @@ class Moolah
      * @param ChargeTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function authorize(ChargeTransaction $transaction)
+    public function authorizeCustomerTransaction(ChargeTransaction $transaction)
     {
         // request a new transaction.
         $t = new AuthorizeNetTransaction();
@@ -90,14 +90,14 @@ class Moolah
         $transaction->setAuthorizationCode($response->getTransactionResponse()->authorization_code);
 
         // move to a new state... i suggest anywhere but florida.
-        $transaction->setTransactionState(3);
+        $transaction->setTransactionState(2);
     }
 
     /**
      * @param ChargeTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function capture(ChargeTransaction $transaction)
+    public function captureCustomerTransaction(ChargeTransaction $transaction)
     {
         // try to capture the payment.
         $t                           = new AuthorizeNetTransaction();
@@ -125,9 +125,9 @@ class Moolah
      */
     public function createCustomerTransaction(ChargeTransaction $transaction)
     {
-        $this->authorize($transaction);
+        $this->authorizeCustomerTransaction($transaction);
 
-        $this->capture($transaction);
+        $this->captureCustomerTransaction($transaction);
     }
 
     /**
