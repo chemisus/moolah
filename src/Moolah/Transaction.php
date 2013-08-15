@@ -21,4 +21,6 @@ interface Transaction
     public function getTransactionStatus();
 
     public function setTransactionStatus($value);
+
+    public function setTransactionResponseCode($value);
 }

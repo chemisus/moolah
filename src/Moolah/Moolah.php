@@ -79,6 +79,8 @@ class Moolah
 
         $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
 
+        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
         }
@@ -108,6 +110,8 @@ class Moolah
         $response                    = $this->request->createCustomerProfileTransaction("CaptureOnly", $t);
 
         $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
+
+        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
 
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
@@ -146,6 +150,8 @@ class Moolah
 
         $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
 
+        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+
         if ($response->getMessageCode() !== "I00001") {
             $transaction->setTransactionStatus(1);
 
@@ -173,6 +179,8 @@ class Moolah
         $response = $this->request->createCustomerProfileTransaction("Refund", $t);
 
         $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
+
+        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
 
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
