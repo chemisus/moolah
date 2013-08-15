@@ -4,7 +4,6 @@ namespace Moolah;
 
 interface ChargeTransaction extends Transaction
 {
-    public function getTransactionAmount();
 
     public function getAuthorizationCode();
 

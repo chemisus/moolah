@@ -6,7 +6,7 @@ use Mockery;
 use Moolah\Moolah;
 use Moolah\ProcessPaymentCommand;
 use PHPUnit_Framework_TestCase;
-use Moolah\TestChargeTransaction;
+use Moolah\TestTransaction;
 use Moolah\TestCustomerProfile;
 use Moolah\TestPaymentProfile;
 
@@ -70,7 +70,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $authorization_code = null;
 
         $payment_profile = Mockery::mock('Moolah\PaymentProfile');
-        $transaction     = Mockery::mock('Moolah\ChargeTransaction');
+        $transaction     = Mockery::mock('Moolah\Transaction');
 
         $payment_profile->shouldReceive('getCustomerProfileId')->andReturn('20314281');
         $payment_profile->shouldReceive('getPaymentProfileId')->andReturn('18602036');
@@ -116,7 +116,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 
         $payment_profile = Mockery::mock('Moolah\PaymentProfile');
-        $transaction     = Mockery::mock('Moolah\ChargeTransaction');
+        $transaction     = Mockery::mock('Moolah\Transaction');
 
         $transaction_id     = null;
         $transaction_state  = null;
@@ -166,6 +166,18 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $moolah->createCustomerTransaction($payment_profile, $transaction);
 
         $moolah->voidCustomerTransaction($transaction);
+    }
+
+    public function testRefundCustomerTransaction()
+    {
+        $moolah = new Moolah($this->login_key, $this->transaction_key);
+
+        $customer_profile = new TestCustomerProfile('', '20322219');
+        $payment_profile = new TestPaymentProfile($customer_profile, '18608980');
+
+        $transaction = new TestTransaction('10601.00', '2197104426');
+
+        $moolah->refundCustomerTransaction($payment_profile, $transaction);
     }
 
     public function testDeleteCustomerProfile()
@@ -388,7 +400,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $payment_profile = new TestPaymentProfile($customer_profile);
 
-        $charge_transaction = new TestChargeTransaction(rand(1, 99999));
+        $charge_transaction = new TestTransaction(rand(1, 99999));
 
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 

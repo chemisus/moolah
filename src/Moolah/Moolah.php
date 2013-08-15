@@ -141,9 +141,22 @@ class Moolah
      * @param Transaction $transaction
      * @throws \Exception
      */
-    public function refundCustomerTransaction(Transaction $transaction)
+    public function refundCustomerTransaction(PaymentProfile $payment_profile, Transaction $transaction)
     {
-        throw new \Exception('not implemented yet');
+        $t = new AuthorizeNetTransaction;
+
+        $t->customerProfileId = $payment_profile->getCustomerProfileId();
+        $t->customerPaymentProfileId = $payment_profile->getPaymentProfileId();
+        $t->transId = $transaction->getTransactionId();
+        $t->amount = $transaction->getTransactionAmount();
+
+        $response = $this->request->createCustomerProfileTransaction("Refund", $t);
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
+
+        var_dump($response);
     }
 
     /**

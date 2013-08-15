@@ -2,7 +2,7 @@
 
 namespace Moolah;
 
-class TestChargeTransaction implements ChargeTransaction
+class TestTransaction implements ChargeTransaction
 {
 
     private $authorization_code;

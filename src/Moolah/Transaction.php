@@ -4,6 +4,8 @@ namespace Moolah;
 
 interface Transaction
 {
+    public function getTransactionAmount();
+
     public function getTransactionId();
 
     public function setTransactionId($transaction_id);
