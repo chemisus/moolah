@@ -4,6 +4,10 @@ namespace Moolah;
 
 interface Transaction
 {
+    public function getCustomerProfileId();
+
+    public function getPaymentProfileId();
+
     public function getTransactionAmount();
 
     public function getTransactionId();

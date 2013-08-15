@@ -59,14 +59,18 @@ class Moolah
         }
     }
 
-    public function authorize(PaymentProfile $payment_profile, ChargeTransaction $transaction)
+    /**
+     * @param ChargeTransaction $transaction
+     * @throws Exception\MoolahException
+     */
+    public function authorize(ChargeTransaction $transaction)
     {
         // request a new transaction.
         $t = new AuthorizeNetTransaction();
 
         $t->amount                   = $transaction->getTransactionAmount();
-        $t->customerProfileId        = $payment_profile->getCustomerProfileID();
-        $t->customerPaymentProfileId = $payment_profile->getPaymentProfileID();
+        $t->customerProfileId        = $transaction->getCustomerProfileId();
+        $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
 
         // set transaction to pending.
         $transaction->setTransactionState(1);
@@ -87,14 +91,18 @@ class Moolah
         $transaction->setTransactionState(3);
     }
 
-    public function capture(PaymentProfile $payment_profile, ChargeTransaction $transaction)
+    /**
+     * @param ChargeTransaction $transaction
+     * @throws Exception\MoolahException
+     */
+    public function capture(ChargeTransaction $transaction)
     {
         // try to capture the payment.
         $t                           = new AuthorizeNetTransaction();
         $t->approvalCode             = $transaction->getAuthorizationCode();
         $t->amount                   = $transaction->getTransactionAmount();
-        $t->customerProfileId        = $payment_profile->getCustomerProfileID();
-        $t->customerPaymentProfileId = $payment_profile->getPaymentProfileID();
+        $t->customerProfileId        = $transaction->getCustomerProfileId();
+        $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
         $response                    = $this->request->createCustomerProfileTransaction("CaptureOnly", $t);
 
         if ($response->getMessageCode() !== "I00001") {
@@ -109,15 +117,14 @@ class Moolah
     }
 
     /**
-     * @param PaymentProfile $payment_profile
      * @param ChargeTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function createCustomerTransaction(PaymentProfile $payment_profile, ChargeTransaction $transaction)
+    public function createCustomerTransaction(ChargeTransaction $transaction)
     {
-        $this->authorize($payment_profile, $transaction);
+        $this->authorize($transaction);
 
-        $this->capture($payment_profile, $transaction);
+        $this->capture($transaction);
     }
 
     /**
@@ -141,12 +148,12 @@ class Moolah
      * @param Transaction $transaction
      * @throws \Exception
      */
-    public function refundCustomerTransaction(PaymentProfile $payment_profile, Transaction $transaction)
+    public function refundCustomerTransaction(Transaction $transaction)
     {
         $t = new AuthorizeNetTransaction;
 
-        $t->customerProfileId = $payment_profile->getCustomerProfileId();
-        $t->customerPaymentProfileId = $payment_profile->getPaymentProfileId();
+        $t->customerProfileId = $transaction->getCustomerProfileId();
+        $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
         $t->transId = $transaction->getTransactionId();
         $t->amount = $transaction->getTransactionAmount();
 

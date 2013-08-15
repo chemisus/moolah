@@ -12,12 +12,14 @@ class TestTransaction implements ChargeTransaction
     private $transaction_status;
 
     public function __construct(
+        PaymentProfile $payment_profile,
         $transaction_amount,
         $transaction_id = null,
         $transaction_state = null,
         $transaction_status = null,
         $authorization_code = null
     ) {
+        $this->payment_profile = $payment_profile;
         $this->transaction_id     = $transaction_id;
         $this->authorization_code = $authorization_code;
         $this->transaction_status = $transaction_status;
@@ -68,5 +70,15 @@ class TestTransaction implements ChargeTransaction
     public function setTransactionStatus($value)
     {
         $this->transaction_status = $value;
+    }
+
+    public function getCustomerProfileId()
+    {
+        return $this->payment_profile->getCustomerProfileId();
+    }
+
+    public function getPaymentProfileId()
+    {
+        return $this->payment_profile->getPaymentProfileId();
     }
 }

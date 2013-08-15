@@ -106,7 +106,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
             }
         );
 
-        $moolah->createCustomerTransaction($payment_profile, $transaction);
+        $moolah->createCustomerTransaction($transaction);
 
         $this->assertNotEmpty($transaction_id);
     }
@@ -163,7 +163,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
             }
         );
 
-        $moolah->createCustomerTransaction($payment_profile, $transaction);
+        $moolah->createCustomerTransaction($transaction);
 
         $moolah->voidCustomerTransaction($transaction);
     }
@@ -175,9 +175,9 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $customer_profile = new TestCustomerProfile('', '20322219');
         $payment_profile = new TestPaymentProfile($customer_profile, '18608980');
 
-        $transaction = new TestTransaction('10601.00', '2197104426');
+        $transaction = new TestTransaction($payment_profile, '10601.00', '2197104426');
 
-        $moolah->refundCustomerTransaction($payment_profile, $transaction);
+        $moolah->refundCustomerTransaction($transaction);
     }
 
     public function testDeleteCustomerProfile()
@@ -400,7 +400,7 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $payment_profile = new TestPaymentProfile($customer_profile);
 
-        $charge_transaction = new TestTransaction(rand(1, 99999));
+        $charge_transaction = new TestTransaction($payment_profile, rand(1, 99999));
 
         $moolah = new Moolah($this->login_key, $this->transaction_key);
 
@@ -412,99 +412,14 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $this->assertNotEmpty($payment_profile->getPaymentProfileId());
 
-        $moolah->authorize($payment_profile, $charge_transaction);
+        $moolah->authorize($charge_transaction);
 
         $this->assertNotEmpty($charge_transaction->getTransactionId());
         $this->assertNotEmpty($charge_transaction->getAuthorizationCode());
         $this->assertEquals(3, $charge_transaction->getTransactionState());
 
-        $moolah->capture($payment_profile, $charge_transaction);
+        $moolah->capture($charge_transaction);
 
         $this->assertEquals(2, $charge_transaction->getTransactionState());
     }
-
-//
-//    public function testChargeCard()
-//    {
-//        $amount              = rand(1, 99999);
-//        $payment_transaction = new SimplePaymentTransaction();
-//        $charge_transaction  = new SimpleChargeCardTransaction(
-//            $amount,
-//            $this->card_number,
-//            $this->card_expiration_date
-//        );
-//
-//        $command = new ChargeCardCommand(
-//            $this->login_key,
-//            $this->transaction_key,
-//            $payment_transaction,
-//            $charge_transaction
-//        );
-//
-//        $command->execute();
-//
-//        $this->assertEquals('1', $charge_transaction->getTransactionStatus());
-//        $this->assertEquals(2, $charge_transaction->getTransactionState());
-//        $this->assertNotNull($charge_transaction->getAuthorizationCode());
-//        $this->assertNotNull($payment_transaction->getTransactionID());
-//        $this->assertEquals('CHARGE', $charge_transaction->getTransactionType());
-//    }
-//
-//    public function testChargeCustomer()
-//    {
-//        $amount                       = rand(1, 99999);
-//        $customer_profile_id          = '20147498';
-//        $customer_payment_profile_id  = '18429424';
-//        $customer_shipping_profile_id = '18630558';
-//
-//        $payment_transaction = new SimplePaymentTransaction();
-//        $charge_transaction  = new SimpleChargeCustomerTransaction(
-//            $amount,
-//            $customer_profile_id,
-//            $customer_payment_profile_id,
-//            $customer_shipping_profile_id
-//        );
-//
-//        $command = new ChargeCustomerCommand(
-//            $this->login_key,
-//            $this->transaction_key,
-//            $payment_transaction,
-//            $charge_transaction
-//        );
-//
-//        $command->execute();
-//
-//        $this->assertEquals('CHARGE', $charge_transaction->getTransactionType());
-//        $this->assertNotNull($charge_transaction->getAuthorizationCode());
-//        $this->assertNotNull($payment_transaction->getTransactionID());
-//        $this->assertEquals(2, $charge_transaction->getTransactionState());
-//        $this->assertEquals('1', $charge_transaction->getTransactionStatus());
-//    }
-//
-//    public function testCreateCustomerProfile()
-//    {
-//        $customer = new SimpleCustomer(time() . rand(10, 99));
-//
-//        $create_customer = new CreateCustomerProfileCommand($this->login_key, $this->transaction_key, $customer);
-//
-//        $create_customer->execute();
-//    }
-//
-//    public function testRetrieveCustomerProfile()
-//    {
-//        $customer = new SimpleCustomer(1234, '20314281');
-//
-//        try {
-//            $create_customer = new CreateCustomerProfileCommand($this->login_key, $this->transaction_key, $customer);
-//
-//            $create_customer->execute();
-//        } catch (MoolahException $e) {
-//        }
-//
-//        $retrieve_customer = new RetrieveCustomerProfileCommand($this->login_key, $this->transaction_key, $customer);
-//
-//        $customer_profile = $retrieve_customer->execute();
-//
-//
-//    }
 }
