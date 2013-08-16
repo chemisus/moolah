@@ -4,9 +4,7 @@ namespace Moolah;
 
 class TestPaymentProfile implements PaymentProfile
 {
-
     private $customer_profile;
-
     private $payment_profile_id;
 
     public function __construct(CustomerProfile $customer_profile, $payment_profile_id = null)

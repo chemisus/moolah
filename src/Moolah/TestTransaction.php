@@ -4,27 +4,28 @@ namespace Moolah;
 
 class TestTransaction implements ChargeTransaction
 {
-
-    private $authorization_code;
-    private $transaction_amount;
     private $transaction_id;
-    private $transaction_state;
-    private $transaction_status;
+    private $authorization_code;
+    private $payment_profile;
+    private $response_code;
+    private $state;
+    private $status;
+    private $amount;
 
     public function __construct(
         PaymentProfile $payment_profile,
-        $transaction_amount,
+        $amount,
         $transaction_id = null,
-        $transaction_state = null,
-        $transaction_status = null,
-        $authorization_code = null
+        $authorization_code = null,
+        $state = null,
+        $status = null
     ) {
         $this->payment_profile = $payment_profile;
-        $this->transaction_id     = $transaction_id;
+        $this->amount = $amount;
+        $this->transaction_id = $transaction_id;
         $this->authorization_code = $authorization_code;
-        $this->transaction_status = $transaction_status;
-        $this->transaction_state  = $transaction_state;
-        $this->transaction_amount = $transaction_amount;
+        $this->state = $state;
+        $this->status = $status;
     }
 
     public function getAuthorizationCode()
@@ -37,9 +38,19 @@ class TestTransaction implements ChargeTransaction
         $this->authorization_code = $value;
     }
 
+    public function getCustomerProfileId()
+    {
+        return $this->payment_profile->getCustomerProfileId();
+    }
+
+    public function getPaymentProfileId()
+    {
+        return $this->payment_profile->getPaymentProfileId();
+    }
+
     public function getTransactionAmount()
     {
-        return $this->transaction_amount;
+        return $this->amount;
     }
 
     public function getTransactionId()
@@ -54,31 +65,26 @@ class TestTransaction implements ChargeTransaction
 
     public function getTransactionState()
     {
-        return $this->transaction_state;
+        return $this->state;
     }
 
     public function setTransactionState($value)
     {
-        $this->transaction_state = $value;
+        $this->state = $value;
     }
 
     public function getTransactionStatus()
     {
-        return $this->transaction_status;
+        return $this->status;
     }
 
     public function setTransactionStatus($value)
     {
-        $this->transaction_status = $value;
+        $this->status = $value;
     }
 
-    public function getCustomerProfileId()
+    public function setTransactionResponseCode($value)
     {
-        return $this->payment_profile->getCustomerProfileId();
-    }
-
-    public function getPaymentProfileId()
-    {
-        return $this->payment_profile->getPaymentProfileId();
+        $this->response_code = $value;
     }
 }

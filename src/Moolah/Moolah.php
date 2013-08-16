@@ -93,6 +93,8 @@ class Moolah
 
         // move to a new state... i suggest anywhere but florida.
         $transaction->setTransactionState(2);
+
+        var_dump($response);
     }
 
     /**
@@ -121,6 +123,8 @@ class Moolah
 
         // move to a new state...
         $transaction->setTransactionState(2);
+
+        var_dump($response);
     }
 
     /**
@@ -129,9 +133,36 @@ class Moolah
      */
     public function createCustomerTransaction(ChargeTransaction $transaction)
     {
-        $this->authorizeCustomerTransaction($transaction);
+        // request a new transaction.
+        $t = new AuthorizeNetTransaction();
 
-        $this->captureCustomerTransaction($transaction);
+        $t->amount                   = $transaction->getTransactionAmount();
+        $t->customerProfileId        = $transaction->getCustomerProfileId();
+        $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
+
+        // set transaction to pending.
+        $transaction->setTransactionState(1);
+
+        $response = $this->request->createCustomerProfileTransaction("AuthCapture", $t);
+
+        $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
+
+        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
+
+        // set the transaction id.
+        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
+
+        // set the authorization code.
+        $transaction->setAuthorizationCode($response->getTransactionResponse()->authorization_code);
+
+        // move to a new state... i suggest anywhere but florida.
+        $transaction->setTransactionState(2);
+
+        var_dump($response);
     }
 
     /**
@@ -157,6 +188,9 @@ class Moolah
 
             throw new MoolahException($response->getMessageText());
         }
+
+        // set the transaction id.
+        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
 
         $transaction->setTransactionState(2);
     }
