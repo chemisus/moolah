@@ -86,6 +86,9 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $moolah->authorizeCustomerTransaction($authorize_transaction);
 
+        $this->assertNotEmpty($authorize_transaction->getAuthorizationCode());
+        $this->assertNotEmpty($authorize_transaction->getTransactionId());
+
         $capture_transaction = new TestTransaction(
             $payment_profile,
             $amount,
@@ -94,5 +97,10 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         );
 
         $moolah->captureCustomerTransaction($capture_transaction);
+
+        $this->assertNotEmpty($capture_transaction->getAuthorizationCode());
+        $this->assertNotEmpty($capture_transaction->getTransactionId());
+
+        $this->assertNotEquals($authorize_transaction->getTransactionId(), $capture_transaction->getTransactionId());
     }
 }

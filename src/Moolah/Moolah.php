@@ -93,8 +93,6 @@ class Moolah
 
         // move to a new state... i suggest anywhere but florida.
         $transaction->setTransactionState(2);
-
-        var_dump($response);
     }
 
     /**
@@ -119,12 +117,13 @@ class Moolah
             throw new MoolahException($response->getMessageText());
         }
 
+        // set the transaction id.
+        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
+
         // set the transaction status.
 
         // move to a new state...
         $transaction->setTransactionState(2);
-
-        var_dump($response);
     }
 
     /**
@@ -161,8 +160,6 @@ class Moolah
 
         // move to a new state... i suggest anywhere but florida.
         $transaction->setTransactionState(2);
-
-        var_dump($response);
     }
 
     /**
