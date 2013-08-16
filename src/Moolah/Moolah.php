@@ -127,7 +127,7 @@ class Moolah
         $t->customerProfileId        = $transaction->getCustomerProfileId();
         $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
 
-        $transaction->startedAuthCapture();
+        $transaction->startingAuthCapture();
 
         $response = $this->request->createCustomerProfileTransaction("AuthCapture", $t);
 
@@ -151,9 +151,9 @@ class Moolah
     {
         $t = new AuthorizeNetTransaction;
 
-        $t->transId = $transaction->getTransactionId();
+        $t->transId = $transaction->getReferenceId();
 
-        $transaction->startedVoid();
+        $transaction->startingVoid();
 
         $response = $this->request->createCustomerProfileTransaction("Void", $t);
 
@@ -163,8 +163,6 @@ class Moolah
         );
 
         if ($response->getMessageCode() !== "I00001") {
-            $transaction->setTransactionStatus(1);
-
             throw new MoolahException($response->getMessageText());
         }
     }
@@ -182,7 +180,7 @@ class Moolah
         $t->transId                  = $transaction->getTransactionId();
         $t->amount                   = $transaction->getTransactionAmount();
 
-        $transaction->startedRefund();
+        $transaction->startingRefund();
 
         $response = $this->request->createCustomerProfileTransaction("Refund", $t);
 

@@ -8,6 +8,7 @@ use Moolah\ProcessPaymentCommand;
 use Moolah\TestCustomerProfile;
 use Moolah\TestPaymentProfile;
 use Moolah\TestTransaction;
+use Moolah\TestVoidTransaction;
 use PHPUnit_Framework_TestCase;
 
 class ScenarioTest extends PHPUnit_Framework_TestCase
@@ -58,13 +59,15 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $transaction_id = '2197153463';
 
-        $transaction = new TestTransaction($payment_profile, 14, $transaction_id);
+        $refund_transaction = new TestTransaction($payment_profile, 14, $transaction_id);
 
-        $moolah->refundCustomerTransaction($transaction);
+        $moolah->refundCustomerTransaction($refund_transaction);
 
-        $this->assertNotEquals($transaction_id, $transaction->getTransactionId());
+        $this->assertNotEquals($transaction_id, $refund_transaction->getTransactionId());
 
-        $moolah->voidCustomerTransaction($transaction);
+        $void_transaction = new TestTransaction($payment_profile, 0, $refund_transaction->getTransactionId());
+
+        $moolah->voidCustomerTransaction($void_transaction);
     }
 
     public function testDeleteCustomerProfile()
@@ -126,7 +129,13 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
         $moolah->transactionDetails($capture_transaction);
 
-        $moolah->voidCustomerTransaction($capture_transaction);
+        $void_transaction = new TestVoidTransaction(
+            $payment_profile,
+            $amount,
+            $capture_transaction->getTransactionId()
+        );
+
+        $moolah->voidCustomerTransaction($void_transaction);
 
         $moolah->transactionDetails($capture_transaction);
     }

@@ -2,10 +2,10 @@
 
 namespace Moolah;
 
-interface VoidTransaction extends Transaction
+interface VoidTransaction extends TransactionAction
 {
 
-    public function startedVoid();
+    public function startingVoid();
 
     public function finishedVoid($response_code, $response_reason_code);
 }
