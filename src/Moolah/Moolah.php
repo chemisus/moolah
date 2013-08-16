@@ -186,9 +186,6 @@ class Moolah
             throw new MoolahException($response->getMessageText());
         }
 
-        // set the transaction id.
-        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
-
         $transaction->setTransactionState(2);
     }
 
