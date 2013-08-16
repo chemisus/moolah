@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Chemisus\Moolah;
+namespace Test\Moolah;
 
 use Mockery;
 use Moolah\Moolah;
@@ -20,6 +20,10 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
     private $card_number = '4007000000027';
 
     private $card_expiration_date = '2017-01';
+
+    private $customer_profile_id = '20314281';
+
+    private $payment_profile_id = '18602036';
 
     public function tearDown()
     {
@@ -46,6 +50,21 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
 
     public function testRefundCustomerTransaction()
     {
+        $moolah = new Moolah($this->login_key, $this->transaction_key);
+
+        $customer_profile = new TestCustomerProfile('', $this->customer_profile_id);
+
+        $payment_profile = new TestPaymentProfile($customer_profile, $this->payment_profile_id);
+
+        $transaction_id = '2197153463';
+
+        $transaction = new TestTransaction($payment_profile, 14, $transaction_id);
+
+        $moolah->refundCustomerTransaction($transaction);
+
+        $this->assertNotEquals($transaction_id, $transaction->getTransactionId());
+
+        $moolah->voidCustomerTransaction($transaction);
     }
 
     public function testDeleteCustomerProfile()
@@ -89,6 +108,8 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $this->assertNotEmpty($authorize_transaction->getAuthorizationCode());
         $this->assertNotEmpty($authorize_transaction->getTransactionId());
 
+        $moolah->transactionDetails($authorize_transaction);
+
         $capture_transaction = new TestTransaction(
             $payment_profile,
             $amount,
@@ -102,5 +123,11 @@ class ScenarioTest extends PHPUnit_Framework_TestCase
         $this->assertNotEmpty($capture_transaction->getTransactionId());
 
         $this->assertNotEquals($authorize_transaction->getTransactionId(), $capture_transaction->getTransactionId());
+
+        $moolah->transactionDetails($capture_transaction);
+
+        $moolah->voidCustomerTransaction($capture_transaction);
+
+        $moolah->transactionDetails($capture_transaction);
     }
 }

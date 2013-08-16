@@ -5,6 +5,7 @@ namespace Moolah;
 use AuthorizeNetCIM;
 use AuthorizeNetCustomer;
 use AuthorizeNetPaymentProfile;
+use AuthorizeNetTD;
 use AuthorizeNetTransaction;
 use Moolah\Exception\MoolahException;
 
@@ -60,161 +61,140 @@ class Moolah
     }
 
     /**
-     * @param ChargeTransaction $transaction
+     * @param AuthorizeTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function authorizeCustomerTransaction(ChargeTransaction $transaction)
+    public function authorizeCustomerTransaction(AuthorizeTransaction $transaction)
     {
-        // request a new transaction.
         $t = new AuthorizeNetTransaction();
 
         $t->amount                   = $transaction->getTransactionAmount();
         $t->customerProfileId        = $transaction->getCustomerProfileId();
         $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
 
-        // set transaction to pending.
-        $transaction->setTransactionState(1);
+        $transaction->startingAuthorize();
 
         $response = $this->request->createCustomerProfileTransaction("AuthOnly", $t);
 
-        $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
-
-        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+        $transaction->finishedAuthorize(
+            $response->getTransactionResponse()->transaction_id,
+            $response->getTransactionResponse()->authorization_code,
+            $response->getTransactionResponse()->response_code,
+            $response->getTransactionResponse()->response_reason_code
+        );
 
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
         }
-
-        // set the transaction id.
-        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
-
-        // set the authorization code.
-        $transaction->setAuthorizationCode($response->getTransactionResponse()->authorization_code);
-
-        // move to a new state... i suggest anywhere but florida.
-        $transaction->setTransactionState(2);
     }
 
     /**
-     * @param ChargeTransaction $transaction
+     * @param CaptureTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function captureCustomerTransaction(ChargeTransaction $transaction)
+    public function captureCustomerTransaction(CaptureTransaction $transaction)
     {
-        // try to capture the payment.
         $t                           = new AuthorizeNetTransaction();
         $t->approvalCode             = $transaction->getAuthorizationCode();
         $t->amount                   = $transaction->getTransactionAmount();
         $t->customerProfileId        = $transaction->getCustomerProfileId();
         $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
-        $response                    = $this->request->createCustomerProfileTransaction("CaptureOnly", $t);
 
-        $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
+        $transaction->startingCapture();
 
-        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+        $response = $this->request->createCustomerProfileTransaction("CaptureOnly", $t);
+
+        $transaction->finishedCapture(
+            $response->getTransactionResponse()->transaction_id,
+            $response->getTransactionResponse()->response_code,
+            $response->getTransactionResponse()->response_reason_code
+        );
 
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
         }
-
-        // set the transaction id.
-        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
-
-        // set the transaction status.
-
-        // move to a new state...
-        $transaction->setTransactionState(2);
     }
 
     /**
-     * @param ChargeTransaction $transaction
+     * @param AuthorizeCaptureTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function createCustomerTransaction(ChargeTransaction $transaction)
+    public function createCustomerTransaction(AuthorizeCaptureTransaction $transaction)
     {
-        // request a new transaction.
         $t = new AuthorizeNetTransaction();
 
         $t->amount                   = $transaction->getTransactionAmount();
         $t->customerProfileId        = $transaction->getCustomerProfileId();
         $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
 
-        // set transaction to pending.
-        $transaction->setTransactionState(1);
+        $transaction->startedAuthCapture();
 
         $response = $this->request->createCustomerProfileTransaction("AuthCapture", $t);
 
-        $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
-
-        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+        $transaction->finishedAuthCapture(
+            $response->getTransactionResponse()->transaction_id,
+            $response->getTransactionResponse()->authorization_code,
+            $response->getTransactionResponse()->response_code,
+            $response->getTransactionResponse()->response_reason_code
+        );
 
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
         }
-
-        // set the transaction id.
-        $transaction->setTransactionID($response->getTransactionResponse()->transaction_id);
-
-        // set the authorization code.
-        $transaction->setAuthorizationCode($response->getTransactionResponse()->authorization_code);
-
-        // move to a new state... i suggest anywhere but florida.
-        $transaction->setTransactionState(2);
     }
 
     /**
-     * @param Transaction $transaction
+     * @param VoidTransaction $transaction
      * @throws Exception\MoolahException
      */
-    public function voidCustomerTransaction(Transaction $transaction)
+    public function voidCustomerTransaction(VoidTransaction $transaction)
     {
-        $transaction->setTransactionState(1);
-
         $t = new AuthorizeNetTransaction;
 
         $t->transId = $transaction->getTransactionId();
 
+        $transaction->startedVoid();
+
         $response = $this->request->createCustomerProfileTransaction("Void", $t);
 
-        $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
-
-        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+        $transaction->finishedVoid(
+            $response->getTransactionResponse()->response_code,
+            $response->getTransactionResponse()->response_reason_code
+        );
 
         if ($response->getMessageCode() !== "I00001") {
             $transaction->setTransactionStatus(1);
 
             throw new MoolahException($response->getMessageText());
         }
-
-        $transaction->setTransactionState(2);
     }
 
     /**
-     * @param Transaction $transaction
-     * @throws \Exception
+     * @param RefundTransaction $transaction
+     * @throws Exception\MoolahException
      */
-    public function refundCustomerTransaction(Transaction $transaction)
+    public function refundCustomerTransaction(RefundTransaction $transaction)
     {
-        $transaction->setTransactionState(1);
-
         $t = new AuthorizeNetTransaction;
 
-        $t->customerProfileId = $transaction->getCustomerProfileId();
+        $t->customerProfileId        = $transaction->getCustomerProfileId();
         $t->customerPaymentProfileId = $transaction->getPaymentProfileId();
-        $t->transId = $transaction->getTransactionId();
-        $t->amount = $transaction->getTransactionAmount();
+        $t->transId                  = $transaction->getTransactionId();
+        $t->amount                   = $transaction->getTransactionAmount();
+
+        $transaction->startedRefund();
 
         $response = $this->request->createCustomerProfileTransaction("Refund", $t);
 
-        $transaction->setTransactionStatus($response->getTransactionResponse()->response_code);
-
-        $transaction->setTransactionResponseCode($response->getTransactionResponse()->response_reason_code);
+        $transaction->finishedRefund(
+            $response->getTransactionResponse()->transaction_id,
+            $response->getTransactionResponse()->response_code,
+            $response->getTransactionResponse()->response_reason_code
+        );
 
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
         }
-
-        $transaction->setTransactionState(2);
     }
 
     /**
@@ -307,5 +287,18 @@ class Moolah
         if ($response->getMessageCode() !== "I00001") {
             throw new MoolahException($response->getMessageText());
         }
+    }
+
+    public function transactionDetails(Transaction $transaction)
+    {
+        $request = new AuthorizeNetTD($this->login_key, $this->transaction_key);
+
+        $response = $request->getTransactionDetails($transaction->getTransactionId());
+
+        if ($response->getMessageCode() !== "I00001") {
+            throw new MoolahException($response->getMessageText());
+        }
+
+        return $response;
     }
 }

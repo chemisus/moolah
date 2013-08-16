@@ -2,7 +2,7 @@
 
 namespace Moolah;
 
-class TestTransaction implements ChargeTransaction
+class TestTransaction implements AuthorizeTransaction, CaptureTransaction, VoidTransaction, RefundTransaction
 {
     private $transaction_id;
     private $authorization_code;
@@ -28,63 +28,4 @@ class TestTransaction implements ChargeTransaction
         $this->status = $status;
     }
 
-    public function getAuthorizationCode()
-    {
-        return $this->authorization_code;
-    }
-
-    public function setAuthorizationCode($value)
-    {
-        $this->authorization_code = $value;
-    }
-
-    public function getCustomerProfileId()
-    {
-        return $this->payment_profile->getCustomerProfileId();
-    }
-
-    public function getPaymentProfileId()
-    {
-        return $this->payment_profile->getPaymentProfileId();
-    }
-
-    public function getTransactionAmount()
-    {
-        return $this->amount;
-    }
-
-    public function getTransactionId()
-    {
-        return $this->transaction_id;
-    }
-
-    public function setTransactionId($transaction_id)
-    {
-        $this->transaction_id = $transaction_id;
-    }
-
-    public function getTransactionState()
-    {
-        return $this->state;
-    }
-
-    public function setTransactionState($value)
-    {
-        $this->state = $value;
-    }
-
-    public function getTransactionStatus()
-    {
-        return $this->status;
-    }
-
-    public function setTransactionStatus($value)
-    {
-        $this->status = $value;
-    }
-
-    public function setTransactionResponseCode($value)
-    {
-        $this->response_code = $value;
-    }
 }
