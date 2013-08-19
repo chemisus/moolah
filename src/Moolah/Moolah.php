@@ -76,16 +76,21 @@ class Moolah
 
         $response = $this->request->createCustomerProfileTransaction("AuthOnly", $t);
 
+        if ($response->getMessageCode() !== "I00001") {
+            $transaction->errorAuthorize(
+                $response->getTransactionResponse()->response_code,
+                $response->getTransactionResponse()->response_reason_code
+            );
+
+            throw new MoolahException($response->getMessageText());
+        }
+
         $transaction->finishedAuthorize(
             $response->getTransactionResponse()->transaction_id,
             $response->getTransactionResponse()->authorization_code,
             $response->getTransactionResponse()->response_code,
             $response->getTransactionResponse()->response_reason_code
         );
-
-        if ($response->getMessageCode() !== "I00001") {
-            throw new MoolahException($response->getMessageText());
-        }
     }
 
     /**
@@ -104,15 +109,20 @@ class Moolah
 
         $response = $this->request->createCustomerProfileTransaction("CaptureOnly", $t);
 
+        if ($response->getMessageCode() !== "I00001") {
+            $transaction->errorCapture(
+                $response->getTransactionResponse()->response_code,
+                $response->getTransactionResponse()->response_reason_code
+            );
+
+            throw new MoolahException($response->getMessageText());
+        }
+
         $transaction->finishedCapture(
             $response->getTransactionResponse()->transaction_id,
             $response->getTransactionResponse()->response_code,
             $response->getTransactionResponse()->response_reason_code
         );
-
-        if ($response->getMessageCode() !== "I00001") {
-            throw new MoolahException($response->getMessageText());
-        }
     }
 
     /**
@@ -131,16 +141,21 @@ class Moolah
 
         $response = $this->request->createCustomerProfileTransaction("AuthCapture", $t);
 
+        if ($response->getMessageCode() !== "I00001") {
+            $transaction->errorAuthCapture(
+                $response->getTransactionResponse()->response_code,
+                $response->getTransactionResponse()->response_reason_code
+            );
+
+            throw new MoolahException($response->getMessageText());
+        }
+
         $transaction->finishedAuthCapture(
             $response->getTransactionResponse()->transaction_id,
             $response->getTransactionResponse()->authorization_code,
             $response->getTransactionResponse()->response_code,
             $response->getTransactionResponse()->response_reason_code
         );
-
-        if ($response->getMessageCode() !== "I00001") {
-            throw new MoolahException($response->getMessageText());
-        }
     }
 
     /**
@@ -157,14 +172,19 @@ class Moolah
 
         $response = $this->request->createCustomerProfileTransaction("Void", $t);
 
+        if ($response->getMessageCode() !== "I00001") {
+            $transaction->errorVoid(
+                $response->getTransactionResponse()->response_code,
+                $response->getTransactionResponse()->response_reason_code
+            );
+
+            throw new MoolahException($response->getMessageText());
+        }
+
         $transaction->finishedVoid(
             $response->getTransactionResponse()->response_code,
             $response->getTransactionResponse()->response_reason_code
         );
-
-        if ($response->getMessageCode() !== "I00001") {
-            throw new MoolahException($response->getMessageText());
-        }
     }
 
     /**
@@ -184,15 +204,20 @@ class Moolah
 
         $response = $this->request->createCustomerProfileTransaction("Refund", $t);
 
+        if ($response->getMessageCode() !== "I00001") {
+            $transaction->errorRefund(
+                $response->getTransactionResponse()->response_code,
+                $response->getTransactionResponse()->response_reason_code
+            );
+
+            throw new MoolahException($response->getMessageText());
+        }
+
         $transaction->finishedRefund(
             $response->getTransactionResponse()->transaction_id,
             $response->getTransactionResponse()->response_code,
             $response->getTransactionResponse()->response_reason_code
         );
-
-        if ($response->getMessageCode() !== "I00001") {
-            throw new MoolahException($response->getMessageText());
-        }
     }
 
     /**
